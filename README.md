@@ -76,14 +76,18 @@ O formulário calcula os dias desde a Inspeção de Saúde e classifica cada res
 
 | Marco | Janela (dias desde a Inspeção) |
 |---|---|
-| Inicial | 0–15 |
-| 90 dias | 60–120 (±30) |
-| 180 dias | 150–210 (±30) |
-| 270 dias | 240–300 (±30) |
-| Fora dos marcos | qualquer valor nos vãos ou após 300 dias |
+| Inicial | 0–21 |
+| 90 dias | 50–130 (±40) |
+| 180 dias | 140–220 (±40) |
+| 270 dias | 230–310 (±40) |
+| Fora dos marcos | qualquer valor nos vãos (22–49, 131–139, 221–229) ou após 310 dias |
 
 Respostas fora das janelas são aceitas e gravadas, marcadas como "Fora dos marcos" para
 análise separada.
+
+O dashboard reclassifica cada resposta pelo dia real (`dias_desde_inspecao`) sob as janelas
+vigentes, de modo que respostas antigas, gravadas sob a regra anterior (0–15 / ±30), sejam
+reavaliadas pela regra atual.
 
 ## Dashboard — comportamento
 
@@ -126,7 +130,8 @@ análise separada.
 
 Os arquivos aqui são idênticos aos validados no dev, exceto:
 
-- `index.html`: cabeçalho sem o selo "Piloto / homologação" e `<title>` de produção;
+- `index.html`: cabeçalho sem o selo "Piloto / homologação", `<title>` de produção e
+  `versao_formulario` sem o sufixo `DEV`;
 - `index.html` e `dashboard.html`: `SCRIPT_URL` apontando para o Apps Script/planilha de
   **produção** (não o do piloto).
 

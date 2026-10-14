@@ -319,7 +319,7 @@ function buildPayload(){
   /* Escores PROMIS: calculados no servidor (Code.gs). Nada é derivado aqui. */
   payload.rg_cbmerj=normRG(payload.rg_cbmerj);
   payload.nps_classificacao=Number(payload.nps_recomendacao)>=9?'Promotor':Number(payload.nps_recomendacao)>=7?'Neutro':'Detrator';
-  payload.versao_formulario='PROMIS-Global-PTBR-longitudinal-PREMs-essencial-DEV-2026-07-14-janelas-21-40';
+  payload.versao_formulario='PROMIS-Global-PTBR-longitudinal-PREMs-essencial-2026-07-14-janelas-21-40';
   return payload;
 }
 
