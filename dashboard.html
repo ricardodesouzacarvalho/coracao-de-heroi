@@ -577,6 +577,17 @@ function renderPromis(){
     if(Number.isFinite(r.mentalT)){const yy=y(r.mentalT);svg+='<rect x="'+(xx-3).toFixed(1)+'" y="'+(yy-3).toFixed(1)+'" width="6" height="6" fill="#fff" stroke="#b8890b" stroke-width="1.5" opacity=".6"><title>Fora dos marcos · '+day+' dias · T mental '+r.mentalT.toFixed(1)+'</title></rect>';}
   });
   svg+='</svg>';
+  /* Resumo das respostas fora das janelas oficiais, para explicar a presença ou ausência
+     dos marcos intermediários (independe do chip e dos filtros). */
+  const foraAll=markerData('Fora dos marcos');
+  const nGap=foraAll.filter(function(r){return r.intermediate!==null;}).length;
+  const nAfter=foraAll.filter(function(r){const d=num(r.dias_desde_inspecao);return d!==null&&d>310;}).length;
+  const nOther=foraAll.length-nGap-nAfter;
+  let note='Respostas fora das janelas oficiais: '+foraAll.length;
+  if(foraAll.length)note+=' — '+nGap+' nos vãos entre marcos (agrupadas em 45/135/225 dias), '+nAfter+' após 310 dias'+(nOther?', '+nOther+' sem dia registrado':'')+'.';
+  else note+='.';
+  if(!nGap)note+=' Nenhuma resposta nos vãos de 22–49, 131–139 ou 221–229 dias até o momento; os marcos intermediários aparecem quando houver.';
+  svg+='<p class="score-note" id="promisInterNote">'+note+'</p>';
   document.getElementById('promisEvolution').innerHTML=svg;
 }
 
