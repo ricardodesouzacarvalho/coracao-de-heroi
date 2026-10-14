@@ -92,9 +92,12 @@ reavaliadas pela regra atual.
 ## Dashboard — comportamento
 
 - **Acesso restrito:** exige o `DASH_TOKEN` (guardado só na sessão do navegador).
-- **Evolução do PROMIS:** eixo temporal (dias). Marcos oficiais 0/90/180/270 formam a linha;
-  respostas "Fora dos marcos" aparecem como marcadores vazados no dia real, ligadas/desligadas
-  pelo chip correspondente, sem alterar a linha oficial.
+- **Evolução do PROMIS:** eixo temporal (dias). A linha passa pelos marcos oficiais 0/90/180/270
+  e pelos **marcos intermediários 45/135/225 dias** (marcadores vazados), que aglutinam as
+  respostas dos vãos entre janelas (22–49, 131–139 e 221–229 dias). Os intermediários existem
+  **somente no gráfico**: essas respostas seguem classificadas como "Fora dos marcos" e ficam fora
+  dos indicadores do topo, da evolução pareada e da comparação independente. O chip "Fora dos
+  marcos" mostra, além disso, cada resposta fora das janelas como ponto avulso no dia real.
 - **Evolução pareada por participante:** compara o mesmo RG entre marcos. Fluxo estatístico
   adaptado à distribuição da amostra — Shapiro-Wilk decide entre **teste t pareado** (+ d_z de
   Cohen) e **Wilcoxon de postos sinalizados** (+ r), com **correção de Holm-Bonferroni** para as
