@@ -120,7 +120,8 @@ abaixo do gráfico e continuam na triagem assistencial, para que nenhum sinal no
 
 ## Janelas de aplicação dos marcos
 
-O formulário calcula os dias desde a Inspeção de Saúde e classifica cada resposta:
+O formulário (e o `Code.gs`) calcula os dias desde a Inspeção de Saúde e grava o marco de
+**coleta** de cada resposta:
 
 | Marco | Janela (dias desde a Inspeção) |
 |---|---|
@@ -133,23 +134,31 @@ O formulário calcula os dias desde a Inspeção de Saúde e classifica cada res
 Respostas fora das janelas são aceitas e gravadas, marcadas como "Fora dos marcos" para
 análise separada.
 
-O dashboard reclassifica cada resposta pelo dia real (`dias_desde_inspecao`) sob as janelas
-vigentes, de modo que respostas antigas, gravadas sob a regra anterior (0–15 / ±30), sejam
-reavaliadas pela regra atual.
+### Janelas de análise do dashboard
+
+O dashboard reclassifica cada resposta pelo dia real (`dias_desde_inspecao`), independentemente
+do marco gravado. Desde 15/10/2026 o marco Inicial da **análise** foi ampliado para incluir
+todas as primeiras avaliações:
+
+| Marco (análise) | Janela (dias desde a Inspeção) |
+|---|---|
+| Inicial | 0–60 |
+| 90 dias | 61–130 |
+| 180 dias | 140–220 |
+| 270 dias | 230–310 |
+| Fora dos marcos | 131–139, 221–229 ou após 310 dias |
 
 ## Dashboard — comportamento
 
 - **Acesso restrito:** exige o `DASH_TOKEN` (guardado só na sessão do navegador).
-- **Evolução do PROMIS:** eixo temporal (dias). A linha passa pelos marcos oficiais 0/90/180/270
-  e pelos **marcos intermediários 45/135/225 dias** (marcadores vazados), que aglutinam as
-  respostas dos vãos entre janelas (22–49, 131–139 e 221–229 dias). Os intermediários existem
-  **somente no gráfico**: essas respostas seguem classificadas como "Fora dos marcos" e ficam fora
-  dos indicadores do topo, da evolução pareada e da comparação independente. O chip "Fora dos
-  marcos" mostra, além disso, cada resposta fora das janelas como ponto avulso no dia real.
-- **Evolução pareada por participante:** compara o mesmo RG entre marcos. Fluxo estatístico
+- **Evolução do PROMIS:** eixo temporal (dias). A linha passa pelos marcos 0/90/180/270; o chip
+  "Fora dos marcos" mostra cada resposta fora das janelas como ponto avulso no dia real, e o
+  resumo abaixo do gráfico conta essas respostas e as repetidas.
+- **Evolução pareada por participante:** compara o mesmo RG entre todos os pares de marcos —
+  Inicial → 90, 180 e 270 dias; 90 → 180 e 270 dias; 180 → 270 dias. Fluxo estatístico
   adaptado à distribuição da amostra — Shapiro-Wilk decide entre **teste t pareado** (+ d_z de
-  Cohen) e **Wilcoxon de postos sinalizados** (+ r), com **correção de Holm-Bonferroni** para as
-  comparações múltiplas. Implementação validada contra o `scipy`. Respostas "Fora dos marcos"
+  Cohen) e **Wilcoxon de postos sinalizados** (+ r), com **correção de Holm-Bonferroni** sobre
+  todas as comparações da tabela (até 12: 6 pares × 2 domínios). Implementação validada contra o `scipy`. Respostas "Fora dos marcos"
   nunca entram nesta tabela.
 - **PREMs, Jornada dos exames, Medicação/tabagismo e NPS:** sempre contabilizam as respostas
   "Fora dos marcos" (indicadores de experiência/processo, não dependem da janela). Valores em
