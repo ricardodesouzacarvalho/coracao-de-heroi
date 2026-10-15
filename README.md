@@ -57,6 +57,7 @@ O `Code.gs` deste repositório é a referência do que deve estar implantado no 
 3. **Implantar → Gerenciar implantações → Editar (lápis) → Nova versão** — mantém a mesma URL
    já referenciada no `SCRIPT_URL` dos arquivos.
 4. Ajuste `SHEET_NAME` no `Code.gs` se a aba não se chamar `Respostas`.
+5. Crie a aba `Inspecoes` com as datas oficiais (ver "Data oficial da Inspeção de Saúde").
 
 > O `DASH_TOKEN` **nunca** deve ser colocado neste repositório nem nos arquivos HTML.
 > Ele vive apenas nas Propriedades do script (servidor) e é digitado pela equipe no dashboard.
@@ -69,6 +70,25 @@ O `Code.gs` deste repositório é a referência do que deve estar implantado no 
 | `…/exec?action=data` (sem token) | `{"error":"unauthorized"}` |
 | `…/exec?action=check&rg=000&marco=0%20dias` | `{"duplicado":false}` |
 | `…/exec` (sem ação) | `{"error":"acao_desconhecida"}` |
+
+## Data oficial da Inspeção de Saúde
+
+Para que o marco temporal não dependa da memória do participante, o `Code.gs` usa a **data
+oficial da Inspeção** sempre que o RG consta da aba `Inspecoes` da planilha de produção
+(colunas `rg_cbmerj` | `data_inspecao`, uma linha por RG, data em `AAAA-MM-DD`).
+
+- **Novas respostas:** o servidor substitui a data digitada pela oficial, recalcula
+  `dias_desde_inspecao` e o marco, e grava a data digitada em `data_inspecao_informada`.
+  `data_inspecao_fonte` indica a origem ("Referência (Inspeção oficial)" ou "Informada pelo
+  participante"). A deduplicação e a confirmação de envio (`action=check`) usam o marco oficial.
+- **Respostas já gravadas:** rodar uma vez `corrigirInspecoesExistentes()` no editor do Apps
+  Script. A função copia a aba de respostas para um backup, recalcula dias e marco a partir do
+  dia de registro de cada resposta e registra no log as respostas anteriores à data oficial e
+  os casos de mesmo RG no mesmo marco (nada é apagado).
+- RGs fora da lista seguem com a data informada no formulário.
+
+> A lista RG → data é dado pessoal de saúde: fica **somente** na planilha. Nunca a coloque
+> neste repositório (público) nem nos arquivos HTML.
 
 ## Janelas de aplicação dos marcos
 

@@ -582,9 +582,10 @@ function renderPromis(){
   const foraAll=markerData('Fora dos marcos');
   const nGap=foraAll.filter(function(r){return r.intermediate!==null;}).length;
   const nAfter=foraAll.filter(function(r){const d=num(r.dias_desde_inspecao);return d!==null&&d>310;}).length;
-  const nOther=foraAll.length-nGap-nAfter;
+  const nBefore=foraAll.filter(function(r){const d=num(r.dias_desde_inspecao);return d!==null&&d<0;}).length;
+  const nOther=foraAll.length-nGap-nAfter-nBefore;
   let note='Respostas fora das janelas oficiais: '+foraAll.length;
-  if(foraAll.length)note+=' — '+nGap+' nos vãos entre marcos (agrupadas em 45/135/225 dias), '+nAfter+' após 310 dias'+(nOther?', '+nOther+' sem dia registrado':'')+'.';
+  if(foraAll.length)note+=' — '+nGap+' nos vãos entre marcos (agrupadas em 45/135/225 dias), '+nAfter+' após 310 dias'+(nBefore?', '+nBefore+' antes da data oficial da Inspeção':'')+(nOther?', '+nOther+' sem dia registrado':'')+'.';
   else note+='.';
   if(!nGap)note+=' Nenhuma resposta nos vãos de 22–49, 131–139 ou 221–229 dias até o momento; os marcos intermediários aparecem quando houver.';
   svg+='<p class="score-note" id="promisInterNote">'+note+'</p>';
