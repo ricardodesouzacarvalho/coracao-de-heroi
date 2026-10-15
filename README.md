@@ -127,26 +127,23 @@ resposta está aberta, pela data oficial da Inspeção e pelas janelas de análi
 - **Baixa automática:** quando a resposta do marco chega, o militar passa para "Respondido".
 - Alertas de cadastro: sem contato, sem posto, e-mail repetido em outro militar, observações.
 
-### E-mail semanal automático
+### E-mail automático (a cada 3 dias)
 
-`enviarEmailsSemanais()` (no `Code.gs`) roda toda segunda-feira às 8h (Brasília) e envia,
-para quem está na janela, não respondeu o marco e tem e-mail válido e exclusivo na aba
-`Contatos`: o **convite** e, nas semanas seguintes, até **2 lembretes** por marco. Para de enviar
-quando a resposta chega, não repete contato feito (por qualquer canal) nos últimos 6 dias,
-respeita a cota diária do Gmail e registra cada envio na aba `Envios` (canal `email-auto`).
+`enviarEmailsAutomaticos()` (no `Code.gs`) roda todo dia às 8h (Brasília) e envia, para quem
+está na janela, não respondeu o marco e tem e-mail válido e exclusivo na aba `Contatos`: o
+**convite** e até **2 lembretes** por marco, com **intervalo de 3 dias** entre contatos ao mesmo
+militar (por qualquer canal, inclusive WhatsApp registrado no dashboard). A mensagem enfatiza a
+importância da resposta. Para de enviar quando a resposta chega, respeita a cota diária do Gmail
+e registra cada envio na aba `Envios` (canal `email-auto`).
 
 - Remetente: **Programa Coração de Herói** · respostas para `coracaodeheroi.1polcampinho@gmail.com`.
   Se o agendamento for criado na conta do programa, sai dela; se for criado em outra conta, sai
   como o programa quando o endereço estiver configurado em "Enviar e-mail como", ou pela
   própria conta com o nome do programa. O modo usado aparece no log de cada execução.
-- Ativar: rodar uma vez `instalarEnvioSemanal()` pela conta que vai enviar (pede autorização
-  do Gmail). Conferir sem enviar: `previaEmailsSemanais()`. Cancelar: `desinstalarEnvioSemanal()`.
+- Ativar: rodar uma vez `instalarEnvioAutomatico()` pela conta que vai enviar (pede autorização
+  do Gmail). Conferir sem enviar: `previaEmailsAutomaticos()`. Cancelar: `desinstalarEnvioAutomatico()`.
 - Ajustes no `Code.gs`: `MAX_LEMBRETES`, `INTERVALO_MIN_DIAS`; no piloto, propriedade do script
   `FORM_URL` com o link do formulário do piloto.
-
-> Contatos são dados pessoais: ficam **somente** na aba `Contatos` da planilha e chegam ao
-> dashboard apenas pelo `action=data`, que exige o token. Nunca os coloque neste repositório
-> (público, publicado pelo GitHub Pages).
 
 ## Respostas repetidas (sem bloqueio)
 
