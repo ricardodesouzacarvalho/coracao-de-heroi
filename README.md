@@ -85,10 +85,30 @@ oficial da Inspeção** sempre que o RG consta da aba `Inspecoes` da planilha de
   Script. A função copia a aba de respostas para um backup, recalcula dias e marco a partir do
   dia de registro de cada resposta e registra no log as respostas anteriores à data oficial e
   os casos de mesmo RG com mais de uma resposta no mesmo marco (nada é apagado).
-- RGs fora da lista seguem com a data informada no formulário.
+- RGs fora da lista seguem com a data informada no formulário e vão para a auditoria (ver
+  "Programa fechado nos RGs da lista").
 
 > A lista RG → data é dado pessoal de saúde: fica **somente** na planilha. Nunca a coloque
 > neste repositório (público) nem nos arquivos HTML.
+
+## Programa fechado nos RGs da lista
+
+O programa é fechado nos RGs da aba `Inspecoes`. Um RG que não consta dela é tratado como erro
+de digitação ou participante não incluído:
+
+- a resposta é gravada, com `rg_no_programa` = `Não`;
+- o formulário mostra ao participante que o RG informado não está incluído no programa e pede
+  contato pelo WhatsApp **(21) 99278-9615** (link `wa.me` com mensagem pronta) para verificar a
+  divergência;
+- o dashboard exclui essas respostas de **todas** as análises e as lista na seção
+  **Auditoria · RGs fora do programa** (identificador mascarado, data e hora de registro, data
+  informada, marco e situação do contato).
+
+Resolvida a divergência, corrija o RG na aba `Respostas` (ou inclua o RG na aba `Inspecoes`) e
+rode `corrigirInspecoesExistentes()` de novo. Sem a aba `Inspecoes`, nenhum RG é marcado.
+
+O aviso aparece **depois** do envio, na tela de confirmação: uma consulta prévia "este RG está no
+programa?" revelaria a qualquer pessoa quem participa de um programa de saúde cardiovascular.
 
 ## Respostas repetidas (sem bloqueio)
 

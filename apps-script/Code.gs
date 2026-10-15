@@ -86,6 +86,12 @@ function normRg_(value) {
   return String(value || '').replace(/\D/g, '');
 }
 
+/* ---- Programa fechado nos RGs da lista ----
+ * Com a aba INSPECOES_SHEET preenchida, um RG que não consta dela é tratado como erro de
+ * digitação ou participante fora do programa: a resposta é gravada com rg_no_programa = 'Não'
+ * (para auditoria), o dashboard a exclui das análises e o formulário orienta o participante
+ * a contatar a equipe pelo WhatsApp. Sem a aba (ou vazia), nenhum RG é marcado. */
+
 /* ---- Data oficial da Inspeção de Saúde ----
  * Quando o RG consta da aba INSPECOES_SHEET, a data de referência substitui a informada
  * pelo participante (que fica preservada em data_inspecao_informada), e os dias desde a
@@ -164,11 +170,14 @@ function todayYmd_() {
 /** Aplica a data de referência ao registro (payload ou linha). answerYmd = dia da resposta.
  *  Devolve true se o RG constava da lista de referência. */
 function applyInspecaoRef_(rec, answerYmd) {
-  var ref = inspecoesRef_()[normRg_(rec.rg_cbmerj)];
+  var map = inspecoesRef_();
+  var ref = map[normRg_(rec.rg_cbmerj)];
   if (!ref) {
     if (!rec.data_inspecao_fonte) rec.data_inspecao_fonte = FONTE_INFORMADA;
+    if (Object.keys(map).length) rec.rg_no_programa = 'Não';
     return false;
   }
+  rec.rg_no_programa = 'Sim';
   if (rec.data_inspecao_informada === undefined || rec.data_inspecao_informada === '') {
     rec.data_inspecao_informada = ymd_(rec.data_inspecao) || String(rec.data_inspecao || '');
   }
@@ -243,7 +252,12 @@ function doGet(e) {
     var envio = cleanEnvio_(e.parameter.envio);
     if (!envio) return output_(e, { error: 'envio_invalido' });
     var found = findEnvio_(envio);
-    return output_(e, found ? { gravado: true, momento: String(found.momento_avaliacao || found.marco_programa || '') } : { gravado: false });
+    if (!found) return output_(e, { gravado: false });
+    return output_(e, {
+      gravado: true,
+      momento: String(found.momento_avaliacao || found.marco_programa || ''),
+      rg_no_programa: String(found.rg_no_programa || '') !== 'Não'
+    });
   }
 
   if (action === 'check') {
@@ -337,7 +351,7 @@ function corrigirInspecoesExistentes() {
 
     var values = sh.getDataRange().getValues();
     var head = values[0].slice();
-    ['data_inspecao_informada', 'data_inspecao_fonte'].forEach(function (k) {
+    ['data_inspecao_informada', 'data_inspecao_fonte', 'rg_no_programa'].forEach(function (k) {
       if (head.indexOf(k) < 0) head.push(k);
     });
     var stats = { comReferencia: 0, semReferencia: 0, marcoAlterado: 0, antesDaInspecao: 0, semDataResposta: 0 };
@@ -366,7 +380,7 @@ function corrigirInspecoesExistentes() {
     sh.getRange(1, 1, out.length, head.length).setValues(out);
     Logger.log('Backup criado na aba: ' + backup.getName());
     Logger.log('Respostas com data oficial aplicada: ' + stats.comReferencia + ' (marco alterado em ' + stats.marcoAlterado + ')');
-    Logger.log('Respostas de RGs fora da lista (data informada mantida): ' + stats.semReferencia);
+    Logger.log('Respostas de RGs fora da lista (rg_no_programa = Não; excluídas das análises e listadas na auditoria do dashboard): ' + stats.semReferencia);
     if (stats.antesDaInspecao) Logger.log('ATENÇÃO: ' + stats.antesDaInspecao + ' resposta(s) registradas ANTES da data oficial — marcadas como "Antes da Inspeção de referência".');
     if (stats.semDataResposta) Logger.log('ATENÇÃO: ' + stats.semDataResposta + ' resposta(s) sem data de registro — data oficial gravada, dias e marco não recalculados.');
     if (repetidas.length) Logger.log('Mesmo RG com mais de uma resposta no mesmo marco após a correção (aceito; nada foi apagado; nas estatísticas do dashboard vale a primeira):\n' + repetidas.join('\n'));
