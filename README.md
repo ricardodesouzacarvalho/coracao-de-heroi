@@ -58,6 +58,9 @@ O `Code.gs` deste repositório é a referência do que deve estar implantado no 
    já referenciada no `SCRIPT_URL` dos arquivos.
 4. Ajuste `SHEET_NAME` no `Code.gs` se a aba não se chamar `Respostas`.
 5. Crie a aba `Inspecoes` com as datas oficiais (ver "Data oficial da Inspeção de Saúde").
+6. Crie a aba `Contatos` (cabeçalho `RG | Nome | Posto/Graduação | Telefone_WhatsApp |
+   Link_WhatsApp | E-mail | Observação`) para o controle de envio. A aba `Envios` é criada
+   automaticamente no primeiro envio registrado.
 
 > O `DASH_TOKEN` **nunca** deve ser colocado neste repositório nem nos arquivos HTML.
 > Ele vive apenas nas Propriedades do script (servidor) e é digitado pela equipe no dashboard.
@@ -109,6 +112,24 @@ rode `corrigirInspecoesExistentes()` de novo. Sem a aba `Inspecoes`, nenhum RG �
 
 O aviso aparece **depois** do envio, na tela de confirmação: uma consulta prévia "este RG está no
 programa?" revelaria a qualquer pessoa quem participa de um programa de saúde cardiovascular.
+
+## Controle de envio do formulário
+
+Seção do dashboard que lista os militares do programa (aba `Inspecoes`) cuja janela de
+resposta está aberta, pela data oficial da Inspeção e pelas janelas de análise (Inicial 0–60,
+90 dias 61–130, 180 dias 140–220, 270 dias 230–310), e os que entram na janela em até 14 dias.
+
+- **Mensagem individualizada** (posto, nome, marco, prazo, data da Inspeção a informar e link
+  do formulário), aberta já preenchida no **WhatsApp** (`wa.me`) ou no **e-mail** (`mailto:`).
+  Canal sugerido: e-mail quando houver e-mail válido e exclusivo; senão, WhatsApp.
+- **Registro do envio:** o clique grava data, RG, marco e canal na aba `Envios`
+  (`action=envio`, exige o token).
+- **Baixa automática:** quando a resposta do marco chega, o militar passa para "Respondido".
+- Alertas de cadastro: sem contato, sem posto, e-mail repetido em outro militar, observações.
+
+> Contatos são dados pessoais: ficam **somente** na aba `Contatos` da planilha e chegam ao
+> dashboard apenas pelo `action=data`, que exige o token. Nunca os coloque neste repositório
+> (público, publicado pelo GitHub Pages).
 
 ## Respostas repetidas (sem bloqueio)
 
