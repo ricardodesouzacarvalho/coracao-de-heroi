@@ -175,7 +175,8 @@ reavaliadas pela regra atual.
 
 - `POST` em `no-cors` seguido de confirmação ativa pelo id do envio (`action=check&envio=…`): a
   tela de sucesso só aparece após o Apps Script localizar a resposta gravada, e mostra o marco
-  registrado pelo servidor (o oficial, quando o RG tem data de referência).
+  registrado pelo servidor (o oficial, quando o RG tem data de referência). Se o Apps Script
+  ainda for a versão anterior (sem confirmação por id), o formulário usa a consulta legada.
 - Escalas 0–10 acessíveis por teclado; rascunho local com restauração.
 
 ## Diferença para o repositório de desenvolvimento

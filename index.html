@@ -287,11 +287,16 @@ function jsonp(url,params){
 /* Confirma a gravação pelo id do envio (sem bloqueio de respostas repetidas). Devolve o
    resultado do servidor, que traz o marco registrado — calculado pela data oficial da
    Inspeção quando o RG consta da lista de referência —, ou null se não confirmou. */
-async function confirmSaved(envio){
+async function confirmSaved(envio,payload){
   for(let attempt=0;attempt<3;attempt++){
     try{
       const result=await jsonp(SCRIPT_URL,{action:'check',envio:envio});
       if(result&&result.gravado)return result;
+      /* Code.gs anterior (sem confirmação por id) responde com erro: usa a consulta legada */
+      if(result&&result.error){
+        const legacy=await jsonp(SCRIPT_URL,{action:'check',rg:payload.rg_cbmerj,marco:payload.marco_programa});
+        if(legacy&&legacy.duplicado)return {gravado:true,momento:payload.momento_avaliacao||payload.marco_programa,rg_no_programa:true};
+      }
     }catch(error){}
     if(attempt<2)await wait(1200);
   }
@@ -365,7 +370,7 @@ form.addEventListener('submit',async function(event){
   const payload=buildPayload();
   try{
     await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
-    const saved=await confirmSaved(payload.id_envio);
+    const saved=await confirmSaved(payload.id_envio,payload);
     if(!saved)throw new Error('not_confirmed');
     clearDraft();
     const foraDoPrograma=saved.rg_no_programa===false;
