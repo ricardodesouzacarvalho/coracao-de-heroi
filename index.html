@@ -284,31 +284,30 @@ function jsonp(url,params){
     document.body.appendChild(script);
   });
 }
-async function checkDuplicate(rg,marco){
+/* Confirma a gravação pelo id do envio (sem bloqueio de respostas repetidas). Devolve o
+   resultado do servidor, que traz o marco registrado — calculado pela data oficial da
+   Inspeção quando o RG consta da lista de referência —, ou null se não confirmou. */
+async function confirmSaved(envio){
   for(let attempt=0;attempt<3;attempt++){
     try{
-      const result=await jsonp(SCRIPT_URL,{action:'check',rg:rg,marco:marco});
-      return {available:true,duplicado:Boolean(result&&result.duplicado)};
-    }catch(error){if(attempt<2)await wait(1200);}
-  }
-  return {available:false,duplicado:false};
-}
-async function confirmSaved(rg,marco){
-  for(let attempt=0;attempt<3;attempt++){
-    try{
-      const result=await jsonp(SCRIPT_URL,{action:'check',rg:rg,marco:marco});
-      if(result&&result.duplicado)return true;
+      const result=await jsonp(SCRIPT_URL,{action:'check',envio:envio});
+      if(result&&result.gravado)return result;
     }catch(error){}
     if(attempt<2)await wait(1200);
   }
-  return false;
+  return null;
+}
+function newEnvioId(){
+  if(window.crypto&&crypto.randomUUID)return crypto.randomUUID();
+  return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,12)+'-'+Math.random().toString(36).slice(2,12);
 }
 
 function buildPayload(){
   const data=new FormData(form),payload={
     carimbo_data_hora:new Date().toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'}),
     carimbo_iso:new Date().toISOString(),
-    lgpd_versao_texto:CONSENT_VERSION
+    lgpd_versao_texto:CONSENT_VERSION,
+    id_envio:newEnvioId()
   };
   Array.from(new Set(Array.from(data.keys()))).forEach(function(key){payload[key]=data.getAll(key).join('; ');});
   delete payload.rg_cbmerj_confirmacao;
@@ -319,7 +318,7 @@ function buildPayload(){
   /* Escores PROMIS: calculados no servidor (Code.gs). Nada é derivado aqui. */
   payload.rg_cbmerj=normRG(payload.rg_cbmerj);
   payload.nps_classificacao=Number(payload.nps_recomendacao)>=9?'Promotor':Number(payload.nps_recomendacao)>=7?'Neutro':'Detrator';
-  payload.versao_formulario='PROMIS-Global-PTBR-longitudinal-PREMs-essencial-2026-07-14-janelas-21-40';
+  payload.versao_formulario='PROMIS-Global-PTBR-longitudinal-PREMs-essencial-2026-10-15-janelas-21-40-sem-bloqueio';
   return payload;
 }
 
@@ -365,19 +364,17 @@ form.addEventListener('submit',async function(event){
   button.textContent='Enviando…';
   const payload=buildPayload();
   try{
-    const check=await checkDuplicate(payload.rg_cbmerj,payload.marco_programa);
-    if(!check.available)throw new Error('duplicate_check_unavailable');
-    if(check.duplicado){showError('Este RG já respondeu este período.');setButtonReady();return;}
     await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
-    if(!await confirmSaved(payload.rg_cbmerj,payload.marco_programa))throw new Error('not_confirmed');
+    const saved=await confirmSaved(payload.id_envio);
+    if(!saved)throw new Error('not_confirmed');
     clearDraft();
-    document.getElementById('textoSucesso').textContent='Resposta registrada para o marco '+(payload.momento_avaliacao||payload.marco_programa)+'. Você pode registrar outro período quando for aplicável.';
+    document.getElementById('textoSucesso').textContent='Resposta registrada para o marco '+(saved.momento||payload.momento_avaliacao||payload.marco_programa)+'. Você pode registrar outro período quando for aplicável.';
     form.style.display='none';
     document.querySelectorAll('.intro,.aviso,.progresso').forEach(function(element){element.style.display='none';});
     document.getElementById('telaSucesso').style.display='block';
     window.scrollTo({top:0,behavior:'smooth'});
   }catch(error){
-    showError(error.message==='duplicate_check_unavailable'?'Não foi possível verificar se este marco já foi respondido. Tente novamente em alguns instantes.':'Não foi possível confirmar o registro. Verifique a conexão e tente novamente; a tela só confirma após o Apps Script localizar a resposta.');
+    showError('Não foi possível confirmar o registro. Verifique a conexão e tente novamente; a tela só confirma após o Apps Script localizar a resposta.');
     setButtonReady();
   }
 });

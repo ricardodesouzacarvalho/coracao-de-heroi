@@ -33,9 +33,9 @@ repositório `coracao-de-heroi-dev`; as versões validadas no piloto são promov
 
 ```
 Bombeiro → index.html (GitHub Pages)
-                │  POST (respostas dos itens) + action=check (dedup) + action=ping
+                │  POST (respostas + id_envio) + action=check (confirmação) + action=ping
                 ▼
-        Apps Script (Code.gs)  ──calcula escore, deduplica sob lock, carimba no servidor──▶  Google Sheets
+        Apps Script (Code.gs)  ──calcula escore, aplica data oficial, carimba no servidor──▶  Google Sheets
                 ▲
                 │  action=data (exige DASH_TOKEN) → devolve {ok:true, values:[...]}
         dashboard.html (GitHub Pages)  ──lê e agrega no navegador──▶  gráficos e triagem
@@ -68,7 +68,7 @@ O `Code.gs` deste repositório é a referência do que deve estar implantado no 
 |---|---|
 | `…/exec?action=ping` | `{"ok":true,"pong":"…"}` |
 | `…/exec?action=data` (sem token) | `{"error":"unauthorized"}` |
-| `…/exec?action=check&rg=000&marco=0%20dias` | `{"duplicado":false}` |
+| `…/exec?action=check&envio=teste-00000` | `{"gravado":false}` |
 | `…/exec` (sem ação) | `{"error":"acao_desconhecida"}` |
 
 ## Data oficial da Inspeção de Saúde
@@ -80,15 +80,23 @@ oficial da Inspeção** sempre que o RG consta da aba `Inspecoes` da planilha de
 - **Novas respostas:** o servidor substitui a data digitada pela oficial, recalcula
   `dias_desde_inspecao` e o marco, e grava a data digitada em `data_inspecao_informada`.
   `data_inspecao_fonte` indica a origem ("Referência (Inspeção oficial)" ou "Informada pelo
-  participante"). A deduplicação e a confirmação de envio (`action=check`) usam o marco oficial.
+  participante").
 - **Respostas já gravadas:** rodar uma vez `corrigirInspecoesExistentes()` no editor do Apps
   Script. A função copia a aba de respostas para um backup, recalcula dias e marco a partir do
   dia de registro de cada resposta e registra no log as respostas anteriores à data oficial e
-  os casos de mesmo RG no mesmo marco (nada é apagado).
+  os casos de mesmo RG com mais de uma resposta no mesmo marco (nada é apagado).
 - RGs fora da lista seguem com a data informada no formulário.
 
 > A lista RG → data é dado pessoal de saúde: fica **somente** na planilha. Nunca a coloque
 > neste repositório (público) nem nos arquivos HTML.
+
+## Respostas repetidas (sem bloqueio)
+
+Desde 15/10/2026 não há bloqueio de respostas repetidas: o mesmo RG pode responder mais de uma
+vez o mesmo marco, e todas as respostas são gravadas. No dashboard, as estatísticas (KPIs,
+gráfico, PREMs, evolução pareada, comparação independente e participação) usam a **primeira
+resposta de cada RG por marco**, pela ordem de registro; as seguintes aparecem contadas no resumo
+abaixo do gráfico e continuam na triagem assistencial, para que nenhum sinal novo fique oculto.
 
 ## Janelas de aplicação dos marcos
 
@@ -136,18 +144,19 @@ reavaliadas pela regra atual.
 - ✅ Rascunho local do formulário não persiste identificadores no dispositivo.
 - ✅ Campo de confirmação do RG não é gravado na planilha.
 - ✅ Identificadores mascarados na interface do dashboard.
-- ⚠️ `action=check` (deduplicação) permanece aberto por necessidade do fluxo: revela apenas se um
-  RG já respondeu um marco. Mitigação futura: consulta por hash (SHA-256 + sal).
+- ✅ A confirmação de envio usa um identificador aleatório do envio (`action=check&envio=…`),
+  sem RG.
+- ⚠️ A consulta legada `action=check&rg=…&marco=…` permanece apenas para formulários antigos
+  em cache: revela se um RG já respondeu um marco. Pode ser removida após a transição.
 - ⚠️ O RG segue como identificador por compatibilidade. Migração para código de convite
   pseudonimizado é a evolução recomendada.
 
 ## Confiabilidade do envio
 
-- `POST` em `no-cors` seguido de confirmação ativa (`action=check`): a tela de sucesso só aparece
-  após o Apps Script localizar a resposta gravada.
-- Deduplicação dupla: pré-check no cliente + verificação sob lock no servidor.
-- Escalas 0–10 acessíveis por teclado; rascunho local com restauração; retry no pré-check com
-  timeout de 20 s.
+- `POST` em `no-cors` seguido de confirmação ativa pelo id do envio (`action=check&envio=…`): a
+  tela de sucesso só aparece após o Apps Script localizar a resposta gravada, e mostra o marco
+  registrado pelo servidor (o oficial, quando o RG tem data de referência).
+- Escalas 0–10 acessíveis por teclado; rascunho local com restauração.
 
 ## Diferença para o repositório de desenvolvimento
 
@@ -163,7 +172,7 @@ Os arquivos aqui são idênticos aos validados no dev, exceto:
 - Migrar o RG para código de convite pseudonimizado.
 - Validar metodologicamente a redação adaptada dos itens 1, 2 e 6 do PROMIS antes de comparações
   externas definitivas.
-- Consulta de duplicidade por hash em vez do RG em texto.
+- Remover a consulta legada `action=check&rg=…&marco=…` após a transição.
 
 ## Desenvolvimento local
 

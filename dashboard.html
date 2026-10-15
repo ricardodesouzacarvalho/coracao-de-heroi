@@ -305,6 +305,23 @@ function prepare(r){
   row.intermediate=intermediateOf(row);
   return row;
 }
+/* Respostas repetidas: sem bloqueio no envio, o mesmo RG pode responder mais de uma vez o
+   mesmo marco oficial. Nas estatísticas (KPIs, gráfico, PREMs, evolução pareada, comparação
+   independente, participação) vale a PRIMEIRA resposta de cada RG por marco, pela ordem de
+   registro; as seguintes ficam com repeat=true e só entram na triagem assistencial. */
+function markRepeats(rows){
+  const ts=function(r,i){const t=Date.parse(r.registrado_em_servidor||r.carimbo_iso||'');return Number.isFinite(t)?t:i;};
+  const order=rows.map(function(r,i){return {r:r,t:ts(r,i),i:i};}).sort(function(a,b){return a.t-b.t||a.i-b.i;});
+  const seen={};
+  order.forEach(function(o){
+    const id=String(o.r.rg_cbmerj||'').replace(/\D/g,'');
+    o.r.repeat=false;
+    if(!id||o.r.marker==='Fora dos marcos')return;
+    const key=id+'|'+o.r.marker;
+    if(seen[key])o.r.repeat=true;else seen[key]=true;
+  });
+  return rows;
+}
 function compatible(r){
   return [r.promis_global01,r.promis_global_fisica_bruto,r.promis_global_mental_bruto]
     .some(function(value){return String(value===undefined||value===null?'':value).trim()!=='';});
@@ -408,7 +425,7 @@ function hideGate(){
   document.querySelector('.dashboard-grid').style.display='grid';
 }
 function enterDemo(note){
-  DATA=generateDemo();DEMO=true;
+  DATA=markRepeats(generateDemo());DEMO=true;
   setSource('Demonstração · 149 respostas',true);
   document.getElementById('statusMsg').textContent=note||'';
   hideGate();render();
@@ -431,7 +448,7 @@ async function tryLoad(token){
     }
     const compatibleRows=rowsFromSheet(raw.values).filter(compatible);
     if(!compatibleRows.length){enterDemo('Fonte conectada, ainda sem respostas compatíveis; exibindo simulação.');return;}
-    DATA=compatibleRows.map(prepare);DEMO=false;
+    DATA=markRepeats(compatibleRows.map(prepare));DEMO=false;
     setSource('Dados conectados',false);
     document.getElementById('statusMsg').textContent=DATA.length+' respostas carregadas · '+new Date().toLocaleString('pt-BR');
     hideGate();render();
@@ -460,8 +477,8 @@ document.getElementById('authEnter').addEventListener('click',function(){
 document.getElementById('authInput').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('authEnter').click();});
 document.getElementById('authDemo').addEventListener('click',function(){enterDemo('Demonstração aberta a partir da tela de acesso.');});
 document.getElementById('logoutBtn').addEventListener('click',function(){sessionStorage.removeItem(TOKEN_KEY);DATA=[];showGate('Sessão encerrada.');});
-function filtered(){return DATA.filter(function(r){return ACTIVE.has(r.marker);});}
-function markerData(marker){return DATA.filter(function(r){return r.marker===marker;});}
+function filtered(){return DATA.filter(function(r){return ACTIVE.has(r.marker)&&!r.repeat;});}
+function markerData(marker){return DATA.filter(function(r){return r.marker===marker&&!r.repeat;});}
 function avgField(rows,field){return mean(rows.map(function(r){return num(r[field]);}));}
 function pct(rows,fn){return rows.length?Math.round(rows.filter(fn).length/rows.length*100):0;}
 
@@ -485,7 +502,7 @@ function render(){
   /* rowsProcesso: indicadores de experiência/processo/adesão SEMPRE contam as respostas
      "Fora dos marcos" (independente do chip), pois não dependem da janela temporal exata.
      Os marcos oficiais continuam obedecendo aos chips. */
-  const rowsProcesso=DATA.filter(function(r){return ACTIVE.has(r.marker)||r.marker==='Fora dos marcos';});
+  const rowsProcesso=DATA.filter(function(r){return (ACTIVE.has(r.marker)||r.marker==='Fora dos marcos')&&!r.repeat;});
   renderKpis(rows);
   renderPromis();
   renderPrem(rowsProcesso);
@@ -495,7 +512,8 @@ function render(){
   renderParticipation(rows);
   renderPaired();
   renderIndependent();
-  renderFollowup(rows);
+  /* triagem assistencial inclui respostas repetidas: um sinal novo não pode ficar oculto */
+  renderFollowup(DATA.filter(function(r){return ACTIVE.has(r.marker);}));
 }
 
 function renderKpis(rows){
@@ -587,6 +605,8 @@ function renderPromis(){
   let note='Respostas fora das janelas oficiais: '+foraAll.length;
   if(foraAll.length)note+=' — '+nGap+' nos vãos entre marcos (agrupadas em 45/135/225 dias), '+nAfter+' após 310 dias'+(nBefore?', '+nBefore+' antes da data oficial da Inspeção':'')+(nOther?', '+nOther+' sem dia registrado':'')+'.';
   else note+='.';
+  const nRepeat=DATA.filter(function(r){return r.repeat;}).length;
+  if(nRepeat)note+=' '+nRepeat+' resposta(s) repetida(s) do mesmo RG no mesmo marco: nas estatísticas vale a primeira de cada RG.';
   if(!nGap)note+=' Nenhuma resposta nos vãos de 22–49, 131–139 ou 221–229 dias até o momento; os marcos intermediários aparecem quando houver.';
   svg+='<p class="score-note" id="promisInterNote">'+note+'</p>';
   document.getElementById('promisEvolution').innerHTML=svg;
@@ -734,7 +754,7 @@ function pairedDeltas(){
   const byId={};
   DATA.forEach(function(r){
     const id=String(r.rg_cbmerj||'').trim();
-    if(!id||r.marker==='Fora dos marcos')return;
+    if(!id||r.marker==='Fora dos marcos'||r.repeat)return;
     if(!byId[id])byId[id]={};
     if(!byId[id][r.marker])byId[id][r.marker]=r;
   });

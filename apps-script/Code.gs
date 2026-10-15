@@ -4,12 +4,14 @@
  *
  * AÇÕES GET (JSONP, parâmetro callback):
  *   ?action=ping                     → aquecimento / teste de disponibilidade
- *   ?action=check&rg=…&marco=…       → deduplicação usada pelo formulário público
+ *   ?action=check&envio=…            → confirma a gravação de um envio (id gerado pelo formulário)
+ *   ?action=check&rg=…&marco=…       → legado (formulários antigos em cache): RG já respondeu o marco?
  *   ?action=data&token=…             → dados completos para o dashboard (EXIGE TOKEN)
  *   qualquer outra ação              → erro (fecha o vazamento do GET aberto)
  *
- * POST (JSON): grava uma resposta com carimbo de servidor e deduplicação
- * por rg_cbmerj + marco_programa sob lock (evita corrida entre dispositivos).
+ * POST (JSON): grava uma resposta com carimbo de servidor. Não há bloqueio de respostas
+ * repetidas: o mesmo RG pode responder mais de uma vez o mesmo marco (o dashboard usa a
+ * primeira de cada RG por marco nas estatísticas).
  *
  * CONFIGURAÇÃO OBRIGATÓRIA:
  * 1. Extensões > Apps Script da planilha de respostas: substitua o código por este arquivo.
@@ -205,11 +207,43 @@ function findDuplicate_(rg, marco) {
   return false;
 }
 
+/** Localiza um envio pelo id gerado no formulário; devolve a linha como objeto ou null. */
+function findEnvio_(id) {
+  var sh = sheet_();
+  if (!id || sh.getLastRow() < 2) return null;
+  var values = sh.getDataRange().getValues();
+  var head = values[0];
+  var iId = head.indexOf('id_envio');
+  if (iId < 0) return null;
+  for (var r = values.length - 1; r >= 1; r--) {
+    if (String(values[r][iId]) === id) {
+      var rec = {};
+      head.forEach(function (k, i) { rec[k] = values[r][i]; });
+      return rec;
+    }
+  }
+  return null;
+}
+
+function cleanEnvio_(v) {
+  var s = String(v || '');
+  return /^[\w-]{8,64}$/.test(s) ? s : '';
+}
+
 function doGet(e) {
   var action = String((e && e.parameter && e.parameter.action) || '').toLowerCase();
 
   if (action === 'ping') {
     return output_(e, { ok: true, pong: new Date().toISOString() });
+  }
+
+  if (action === 'check' && e.parameter.envio !== undefined) {
+    // Confirmação de gravação por id do envio: só quem enviou conhece o id, então devolver
+    // o marco registrado (calculado pela data oficial, quando houver) não expõe terceiros.
+    var envio = cleanEnvio_(e.parameter.envio);
+    if (!envio) return output_(e, { error: 'envio_invalido' });
+    var found = findEnvio_(envio);
+    return output_(e, found ? { gravado: true, momento: String(found.momento_avaliacao || found.marco_programa || '') } : { gravado: false });
   }
 
   if (action === 'check') {
@@ -244,15 +278,12 @@ function doPost(e) {
     payload.registrado_em_servidor = new Date().toISOString(); // carimbo confiável (relógio do servidor)
     computeScores_(payload); // fonte única do escore PROMIS (sobrescreve o que vier do cliente)
     applyInspecaoRef_(payload, todayYmd_()); // data oficial da Inspeção, quando o RG está na lista
+    payload.id_envio = cleanEnvio_(payload.id_envio);
 
     var lock = LockService.getScriptLock();
     lock.waitLock(20000);
     try {
-      if (payload.rg_cbmerj && payload.marco_programa &&
-          findDuplicate_(payload.rg_cbmerj, payload.marco_programa)) {
-        return output_(e, { ok: false, duplicado: true });
-      }
-      appendRow_(payload);
+      appendRow_(payload); // sem bloqueio de repetição (decisão de 15/10/2026)
     } finally {
       lock.releaseLock();
     }
@@ -310,7 +341,7 @@ function corrigirInspecoesExistentes() {
       if (head.indexOf(k) < 0) head.push(k);
     });
     var stats = { comReferencia: 0, semReferencia: 0, marcoAlterado: 0, antesDaInspecao: 0, semDataResposta: 0 };
-    var seen = {}, duplicados = [];
+    var seen = {}, repetidas = [];
     var out = [head];
     for (var r = 1; r < values.length; r++) {
       var rec = {};
@@ -327,7 +358,7 @@ function corrigirInspecoesExistentes() {
       }
       var key = normRg_(rec.rg_cbmerj) + '|' + String(rec.marco_programa).trim();
       if (normRg_(rec.rg_cbmerj)) {
-        if (seen[key]) duplicados.push('linha ' + (r + 1) + ' repete a linha ' + seen[key] + ' (RG •••' + normRg_(rec.rg_cbmerj).slice(-3) + ', marco ' + rec.marco_programa + ')');
+        if (seen[key]) repetidas.push('linha ' + (r + 1) + ' repete a linha ' + seen[key] + ' (RG •••' + normRg_(rec.rg_cbmerj).slice(-3) + ', marco ' + rec.marco_programa + ')');
         else seen[key] = r + 1;
       }
       out.push(head.map(function (k) { return rec[k] === undefined ? '' : rec[k]; }));
@@ -338,7 +369,7 @@ function corrigirInspecoesExistentes() {
     Logger.log('Respostas de RGs fora da lista (data informada mantida): ' + stats.semReferencia);
     if (stats.antesDaInspecao) Logger.log('ATENÇÃO: ' + stats.antesDaInspecao + ' resposta(s) registradas ANTES da data oficial — marcadas como "Antes da Inspeção de referência".');
     if (stats.semDataResposta) Logger.log('ATENÇÃO: ' + stats.semDataResposta + ' resposta(s) sem data de registro — data oficial gravada, dias e marco não recalculados.');
-    if (duplicados.length) Logger.log('ATENÇÃO: mesmo RG no mesmo marco após a correção (revisar manualmente; nada foi apagado):\n' + duplicados.join('\n'));
+    if (repetidas.length) Logger.log('Mesmo RG com mais de uma resposta no mesmo marco após a correção (aceito; nada foi apagado; nas estatísticas do dashboard vale a primeira):\n' + repetidas.join('\n'));
   } finally {
     lock.releaseLock();
   }
