@@ -59,8 +59,8 @@ O `Code.gs` deste repositório é a referência do que deve estar implantado no 
 4. Ajuste `SHEET_NAME` no `Code.gs` se a aba não se chamar `Respostas`.
 5. Crie a aba `Inspecoes` com as datas oficiais (ver "Data oficial da Inspeção de Saúde").
 6. Crie a aba `Contatos` (cabeçalho `RG | Nome | Posto/Graduação | Telefone_WhatsApp |
-   Link_WhatsApp | E-mail | Observação`) para o controle de envio. A aba `Envios` é criada
-   automaticamente no primeiro envio registrado.
+   Link_WhatsApp | E-mail | Observação`) para o controle de envio. As abas `Envios` e
+   `Acompanhamento` são criadas automaticamente no primeiro registro feito pelo dashboard.
 
 > O `DASH_TOKEN` **nunca** deve ser colocado neste repositório nem nos arquivos HTML.
 > Ele vive apenas nas Propriedades do script (servidor) e é digitado pela equipe no dashboard.
@@ -211,8 +211,23 @@ todas as primeiras avaliações:
 - **PREMs, Jornada dos exames, Medicação/tabagismo e NPS:** sempre contabilizam as respostas
   "Fora dos marcos" (indicadores de experiência/processo, não dependem da janela). Valores em
   percentual da subseção, com o absoluto no hover.
-- **Triagem assistencial:** lista mascarada (•••nnn) de sinais para acompanhamento — gerencial,
-  não diagnóstica.
+- **Sinais para acompanhamento assistencial:** gerencial, não diagnóstica. Cada caso (RG + marco)
+  com escore ≥ 2 mostra o **nome** do militar (aba `Contatos`; a tela só abre com a chave), os
+  sinais e a prioridade, e traz:
+  - **Mensagem** pronta no WhatsApp ou no e-mail (e-mail só quando é exclusivo do militar), com
+    abertura empática que reconhece que precisamos melhorar, um parágrafo com pergunta aberta
+    para cada problema (saúde física, bem-estar emocional, medicamentos, exames pendentes,
+    acesso a exames, tabagismo) e o convite para buscarmos a solução juntos. Militar com
+    `Desistência` na coluna `Observação` não recebe mensagem.
+  - **Situação** do caso: `Não resolvido` (padrão), `Parcialmente resolvido` ou `Resolvido`.
+  - **Filtros próprios da seção** (independentes dos chips de marco do topo): situação (em aberto,
+    cada situação, todas), prioridade (todas, alta, moderada), marco (todos, Inicial, 90, 180,
+    270, fora dos marcos) e quantidade de casos (10, 25, 50 ou 100), por ordem de prioridade.
+  - **Prévia da mensagem** ao passar o cursor (ou focar pelo teclado) sobre WhatsApp ou E-mail.
+  - A situação e o último contato (data e canal,
+    gravado ao clicar no botão da mensagem) ficam na aba **`Acompanhamento`** da planilha
+    (`action=acompanhamento`, exige o token), criada automaticamente na primeira alteração.
+  - Para sinais de saúde emocional, a mensagem é só a abertura: prefira também ligar ou agendar.
 
 ## Segurança e LGPD
 
@@ -220,7 +235,8 @@ todas as primeiras avaliações:
 - ✅ Nenhum token ou segredo versionado neste repositório.
 - ✅ Rascunho local do formulário não persiste identificadores no dispositivo.
 - ✅ Campo de confirmação do RG não é gravado na planilha.
-- ✅ Identificadores mascarados na interface do dashboard.
+- ✅ Identificadores mascarados nos gráficos e na auditoria. Nome e RG aparecem apenas no controle
+  de envio e no acompanhamento assistencial, que dependem da chave (`action=data`).
 - ✅ A confirmação de envio usa um identificador aleatório do envio (`action=check&envio=…`),
   sem RG.
 - ⚠️ A consulta legada `action=check&rg=…&marco=…` permanece apenas para formulários antigos
