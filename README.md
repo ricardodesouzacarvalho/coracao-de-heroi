@@ -119,13 +119,21 @@ Seção do dashboard que lista os militares do programa (aba `Inspecoes`) cuja j
 resposta está aberta, pela data oficial da Inspeção e pelas janelas de análise (Inicial 0–60,
 90 dias 61–130, 180 dias 140–220, 270 dias 230–310), e os que entram na janela em até 14 dias.
 
-- **Mensagem individualizada** (posto, nome, marco, prazo, data da Inspeção a informar e link
-  do formulário), aberta já preenchida no **WhatsApp** (`wa.me`) ou no **e-mail** (`mailto:`).
+- **Mensagem individualizada** (posto, nome, marco e link do formulário; cerca de 7 minutos e
+  "o quanto antes", sem prazo nem data da Inspeção), aberta já preenchida no **WhatsApp** (`wa.me`) ou no **e-mail** (`mailto:`).
   Canal sugerido: e-mail quando houver e-mail válido e exclusivo; senão, WhatsApp.
 - **Registro do envio:** o clique grava data, RG, marco e canal na aba `Envios`
   (`action=envio`, exige o token).
 - **Baixa automática:** quando a resposta do marco chega, o militar passa para "Respondido".
 - Alertas de cadastro: sem contato, sem posto, e-mail repetido em outro militar, observações.
+- **Coluna `Observação` da aba `Contatos` (regra de envio):**
+  - `Desistência` → **envio suspenso** por qualquer canal (nem e-mail automático, nem botões de
+    WhatsApp/e-mail no dashboard). O militar aparece só no filtro "Suspensos (desistência)".
+    Se ele já tiver respondido o marco, continua contado como respondido.
+  - `Deixou de responder` → **continua recebendo**, com mensagem de **resgate** ("Sentimos a sua
+    falta…"), pelo e-mail automático e pelo dashboard.
+  - Vazio ou qualquer outro texto → regra normal (o texto aparece como alerta no dashboard).
+  A leitura ignora maiúsculas e acentos e vale pelo início do texto (`desist…`, `deixou…`).
 
 ### E-mail automático (a cada 3 dias)
 
@@ -133,7 +141,11 @@ resposta está aberta, pela data oficial da Inspeção e pelas janelas de análi
 está na janela, não respondeu o marco e tem e-mail válido e exclusivo na aba `Contatos`: o
 **convite** e até **2 lembretes** por marco, com **intervalo de 3 dias** entre contatos ao mesmo
 militar (por qualquer canal, inclusive WhatsApp registrado no dashboard). A mensagem enfatiza a
-importância da resposta. Para de enviar quando a resposta chega, respeita a cota diária do Gmail
+importância da resposta (primeira mensagem do marco: "Está aberto o formulário de acompanhamento
+do marco …"; depois de envio registrado para o mesmo marco: "Estamos enviando mais uma vez…";
+cerca de 7 minutos, link). Quem está como `Desistência` na coluna `Observação` da aba
+`Contatos` não recebe; quem está como `Deixou de responder` recebe a mensagem de resgate.
+Para de enviar quando a resposta chega, respeita a cota diária do Gmail
 e registra cada envio na aba `Envios` (canal `email-auto`).
 
 - Remetente: **Programa Coração de Herói** · respostas para `coracaodeheroi.1polcampinho@gmail.com`.
