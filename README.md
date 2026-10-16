@@ -229,6 +229,14 @@ todas as primeiras avaliações:
     (`action=acompanhamento`, exige o token), criada automaticamente na primeira alteração.
   - Para sinais de saúde emocional, a mensagem é só a abertura: prefira também ligar ou agendar.
 
+- **Visual:** cabeçalho com o brasão estilizado do CBMERJ (`assets/brasao-cbmerj.webp`, também
+  ícone da aba) e paleta derivada do brasão: vermelho do anel, ouro da estrela e aço do campo.
+  Os resumos do acompanhamento assistencial e do controle de envio são **gráficos de rosca** com
+  o KPI no centro (**% resolvidos** e **% respondidos na janela**, este sobre quem está na janela
+  agora; quem abre em breve e os suspensos ficam fora do % e aparecem abaixo da legenda).
+  Cores de estado validadas para daltonismo: verde = concluído, ouro = em andamento, vermelho =
+  em aberto. Clicar no segmento ou na legenda aplica o filtro da lista.
+
 ## Segurança e LGPD
 
 - ✅ Leitura de dados (`action=data`) exige token; nenhuma resposta é devolvida sem ele.
