@@ -141,8 +141,9 @@ resposta está aberta, pela data oficial da Inspeção e pelas janelas de análi
 está na janela, não respondeu o marco e tem e-mail válido e exclusivo na aba `Contatos`: o
 **convite** e até **2 lembretes** por marco, com **intervalo de 3 dias** entre contatos ao mesmo
 militar (por qualquer canal, inclusive WhatsApp registrado no dashboard). A mensagem enfatiza a
-importância da resposta ("Estamos enviando mais uma vez o formulário de acompanhamento do marco
-…", cerca de 7 minutos, link). Quem está como `Desistência` na coluna `Observação` da aba
+importância da resposta (primeira mensagem do marco: "Está aberto o formulário de acompanhamento
+do marco …"; depois de envio registrado para o mesmo marco: "Estamos enviando mais uma vez…";
+cerca de 7 minutos, link). Quem está como `Desistência` na coluna `Observação` da aba
 `Contatos` não recebe; quem está como `Deixou de responder` recebe a mensagem de resgate.
 Para de enviar quando a resposta chega, respeita a cota diária do Gmail
 e registra cada envio na aba `Envios` (canal `email-auto`).
