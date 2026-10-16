@@ -219,8 +219,12 @@ todas as primeiras avaliações:
     para cada problema (saúde física, bem-estar emocional, medicamentos, exames pendentes,
     acesso a exames, tabagismo) e o convite para buscarmos a solução juntos. Militar com
     `Desistência` na coluna `Observação` não recebe mensagem.
-  - **Situação** do caso: `Não resolvido` (padrão), `Parcialmente resolvido` ou `Resolvido`,
-    com filtros (em aberto, por situação, todos). A situação e o último contato (data e canal,
+  - **Situação** do caso: `Não resolvido` (padrão), `Parcialmente resolvido` ou `Resolvido`.
+  - **Filtros próprios da seção** (independentes dos chips de marco do topo): situação (em aberto,
+    cada situação, todas), prioridade (todas, alta, moderada), marco (todos, Inicial, 90, 180,
+    270, fora dos marcos) e quantidade de casos (10, 25, 50 ou 100), por ordem de prioridade.
+  - **Prévia da mensagem** ao passar o cursor (ou focar pelo teclado) sobre WhatsApp ou E-mail.
+  - A situação e o último contato (data e canal,
     gravado ao clicar no botão da mensagem) ficam na aba **`Acompanhamento`** da planilha
     (`action=acompanhamento`, exige o token), criada automaticamente na primeira alteração.
   - Para sinais de saúde emocional, a mensagem é só a abertura: prefira também ligar ou agendar.
