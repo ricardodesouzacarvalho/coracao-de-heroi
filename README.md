@@ -153,7 +153,8 @@ e registra cada envio na aba `Envios` (canal `email-auto`).
   como o programa quando o endereço estiver configurado em "Enviar e-mail como", ou pela
   própria conta com o nome do programa. O modo usado aparece no log de cada execução.
 - Ativar: rodar uma vez `instalarEnvioAutomatico()` pela conta que vai enviar (pede autorização
-  do Gmail). Conferir sem enviar: `previaEmailsAutomaticos()`. Cancelar: `desinstalarEnvioAutomatico()`.
+  do Gmail). Conferir sem enviar: `previaEmailsAutomaticos()`. Ver de qual endereço o e-mail sai:
+  `testeRemetente()` (envia um e-mail de teste só para a conta que executa e registra o modo no log). Cancelar: `desinstalarEnvioAutomatico()`.
 - Ajustes no `Code.gs`: `MAX_LEMBRETES`, `INTERVALO_MIN_DIAS`; no piloto, propriedade do script
   `FORM_URL` com o link do formulário do piloto.
 
