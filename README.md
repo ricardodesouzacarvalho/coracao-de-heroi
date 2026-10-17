@@ -236,6 +236,11 @@ todas as primeiras avaliações:
   agora; quem abre em breve e os suspensos ficam fora do % e aparecem abaixo da legenda).
   Cores de estado validadas para daltonismo: verde = concluído, ouro = em andamento, vermelho =
   em aberto. Clicar no segmento ou na legenda aplica o filtro da lista.
+- **PREMs (radar):** cada marco é um chip com o % geral; clicar mostra ou oculta a camada, passar
+  o cursor destaca a camada, e com um só marco ativo os valores de cada dimensão aparecem no
+  gráfico. Cores dos marcos validadas (azul, ouro, vermelho, violeta para 270 dias).
+- **Recomendação do programa:** rosca com o NPS no centro (promotores, neutros, detratores) e
+  histograma das notas de 0 a 10. O cartão do topo usa a mesma base (inclui fora dos marcos).
 
 ## Segurança e LGPD
 
