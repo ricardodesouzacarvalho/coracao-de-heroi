@@ -250,6 +250,12 @@ todas as primeiras avaliações:
 - **PREMs (radar):** cada marco é um chip com o % geral; clicar mostra ou oculta a camada, passar
   o cursor destaca a camada, e com um só marco ativo os valores de cada dimensão aparecem no
   gráfico. Cores dos marcos validadas (azul, ouro, vermelho, violeta para 270 dias).
+- **Participação por marco:** rosca com as respostas por marco (Inicial, 90, 180, 270 e fora dos
+  marcos) e o % nas janelas no centro, sobre todas as respostas (independente do filtro), e o
+  indicador **Tempo do formulário**: % do período decorrido entre a 1ª Inspeção e o término
+  previsto (última Inspeção + 300 dias), com dias restantes, militares que já completaram os 300
+  dias e o acompanhamento médio decorrido. Logo abaixo vem o **Controle de envio do formulário**.
+- **Comparação independente entre marcos:** fica oculta; o chip "Mostrar" a exibe.
 - **Recomendação do programa:** rosca com o NPS no centro (promotores, neutros, detratores) e
   histograma das notas de 0 a 10. O cartão do topo usa a mesma base (inclui fora dos marcos).
 
