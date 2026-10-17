@@ -229,6 +229,17 @@ todas as primeiras avaliações:
     (`action=acompanhamento`, exige o token), criada automaticamente na primeira alteração.
   - Para sinais de saúde emocional, a mensagem é só a abertura: prefira também ligar ou agendar.
 
+- **Rastreio de câncer de pulmão:** lista os fumantes e ex-fumantes pelas respostas ao formulário
+  (com pré-triagem pelo tempo sem fumar informado) e, como os demais, mostra nome, mensagem e
+  situação. A mensagem (WhatsApp/e-mail, com prévia ao passar o cursor) explica a TC de tórax de
+  baixa dose e pergunta idade, cigarros por dia, anos fumando e, para ex-fumantes, há quantos
+  anos parou; para fumantes, oferece também ajuda para parar. Em **Registrar**, a equipe lança as
+  respostas: o painel calcula os **maços-ano** e a **indicação** pelo critério USPSTF 2021 (50 a 80
+  anos, ≥ 20 maços-ano, fumante atual ou que parou há no máximo 15 anos), e registra data da TC,
+  **Lung-RADS** e a conduta sugerida (v2022: 1–2 → nova TC em 12 meses; 3 → 6 meses; 4A → 3
+  meses; 4B/4X → avaliação especializada; decisão médica). Situações: A contatar → Aguardando
+  resposta → Elegível — agendar TC → TC agendada → TC realizada, ou Não elegível / Recusou. Tudo
+  fica na aba **`Rastreio`** da planilha (`action=rastreio`, exige o token), criada automaticamente.
 - **Visual:** cabeçalho com o brasão estilizado do CBMERJ (`assets/brasao-cbmerj.webp`, também
   ícone da aba) e paleta derivada do brasão: vermelho do anel, ouro da estrela e aço do campo.
   Os resumos do acompanhamento assistencial e do controle de envio são **gráficos de rosca** com
