@@ -252,13 +252,14 @@ todas as primeiras avaliações:
   gráfico. Cores dos marcos validadas (azul, ouro, vermelho, violeta para 270 dias).
 - **Participação por marco:** rosca com as respostas por marco (Inicial, 90, 180, 270 e fora dos
   marcos) e o % nas janelas no centro, sobre todas as respostas (independente do filtro).
-  - **Tempo do formulário:** média, entre os militares, da parte já percorrida dos 300 dias de
-    acompanhamento de cada um (a partir da data oficial da Inspeção), com o término previsto
-    (última Inspeção + 300 dias), dias restantes e o % do calendário do programa como referência.
   - **Respostas esperadas até hoje:** respostas recebidas ÷ esperadas, contando por militar cada
     marco cuja janela de análise já abriu (inclusive as abertas), com o detalhe por marco e o %
     só das janelas encerradas. Ficam fora os desistentes e os marcos cuja janela fechou antes do
     início da coleta (data da primeira resposta ao formulário).
+- **Tempo do formulário** (cartão ao lado de Participação por marco): rosca com a fase atual de
+  cada militar no acompanhamento de 300 dias (Inicial 0–60, 90 dias 61–139, 180 dias 140–229,
+  270 dias 230–299, concluídos) e, no centro, a média do tempo já percorrido; término previsto
+  (última Inspeção + 300 dias), dias restantes e o % do calendário do programa como referência.
   Logo abaixo vem o **Controle de envio do formulário**.
 - **Comparação independente entre marcos:** fica oculta; o chip "Mostrar" a exibe.
 - **Recomendação do programa:** rosca com o NPS no centro (promotores, neutros, detratores) e
