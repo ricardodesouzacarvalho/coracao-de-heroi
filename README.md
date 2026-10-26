@@ -240,8 +240,10 @@ todas as primeiras avaliações:
   meses; 4B/4X → avaliação especializada; decisão médica). Situações: A contatar → Aguardando
   resposta → Elegível — agendar TC → TC agendada → TC realizada, ou Não elegível / Recusou. Tudo
   fica na aba **`Rastreio`** da planilha (`action=rastreio`, exige o token), criada automaticamente.
-- **Visual:** cabeçalho com o brasão estilizado do CBMERJ (`assets/brasao-cbmerj.webp`, também
-  ícone da aba) e paleta derivada do brasão: vermelho do anel, ouro da estrela e aço do campo.
+- **Visual:** cabeçalho vermelho com o brasão do CBMERJ em moldura prata e ouro
+  (`assets/brasao-cbmerj.webp`, também ícone da aba e tela de acesso). A paleta segue o brasão:
+  vermelho do anel e do escudo (`--brand`), ouro da estrela e das mangueiras (`--gold`), prata do
+  campo (`--silver`) e preto do contorno (`--ink`).
   Os resumos do acompanhamento assistencial e do controle de envio são **gráficos de rosca** com
   o KPI no centro (**% resolvidos** e **% respondidos na janela**, este sobre quem está na janela
   agora; quem abre em breve e os suspensos ficam fora do % e aparecem abaixo da legenda).
