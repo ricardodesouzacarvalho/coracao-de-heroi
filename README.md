@@ -244,6 +244,11 @@ todas as primeiras avaliações:
   (`assets/brasao-cbmerj.webp`, também ícone da aba e tela de acesso). A paleta segue o brasão:
   vermelho do anel e do escudo (`--brand`), ouro da estrela e das mangueiras (`--gold`), prata do
   campo (`--silver`) e preto do contorno (`--ink`).
+- **Baixar card em PNG:** cada card tem um chip **PNG** no canto superior direito. A imagem sai em
+  alta resolução, com o brasão, a data e os marcos do filtro no rodapé. Cards com nomes ou RGs
+  (controle de envio, acompanhamento, rastreio e auditoria) pedem confirmação antes de baixar. A
+  biblioteca de captura (html2canvas 1.4.1, licença MIT) fica em `assets/vendor/` e só carrega no
+  primeiro clique.
   Os resumos do acompanhamento assistencial e do controle de envio são **gráficos de rosca** com
   o KPI no centro (**% resolvidos** e **% respondidos na janela**, este sobre quem está na janela
   agora; quem abre em breve e os suspensos ficam fora do % e aparecem abaixo da legenda).
