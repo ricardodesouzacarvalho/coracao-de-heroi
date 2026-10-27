@@ -16,7 +16,7 @@ repositório `coracao-de-heroi-dev`; as versões validadas no piloto são promov
 | PROMIS Global Health | 10 itens de saúde percebida (física e mental), convertidos em escore bruto e T-score. |
 | PREMs | Comunicação, decisão compartilhada, coordenação, experiência com os profissionais, jornada dos exames e equipe de navegação. |
 | Contexto de medicação | Adesão nos últimos 7 dias e principal barreira ao tratamento. |
-| Tabagismo | Situação, tempo de cessação (ex-fumantes), abordagem e conduta de cessação. |
+| Tabagismo | Situação; para fumantes e ex-fumantes, idade, cigarros por dia e anos fumando (30a–30c, com a opção "Já respondi anteriormente"); tempo de cessação (ex-fumantes, até "Mais de 15 anos" e "Mais de 20 anos"); abordagem e conduta de cessação. |
 | Recomendação | NPS (0–10) e dois campos abertos. |
 
 ## Arquivos do repositório
@@ -231,10 +231,17 @@ todas as primeiras avaliações:
 
 - **Rastreio de câncer de pulmão:** lista os fumantes e ex-fumantes pelas respostas ao formulário
   (com pré-triagem pelo tempo sem fumar informado) e, como os demais, mostra nome, mensagem e
-  situação. A mensagem (WhatsApp/e-mail, com prévia ao passar o cursor) explica a TC de tórax de
-  baixa dose e pergunta idade, cigarros por dia, anos fumando e, para ex-fumantes, há quantos
-  anos parou; para fumantes, oferece também ajuda para parar. Em **Registrar**, a equipe lança as
-  respostas: o painel calcula os **maços-ano** e a **indicação** pelo critério USPSTF 2021 (50 a 80
+  situação. **Idade, cigarros por dia e anos fumando vêm do questionário** (perguntas 30a–30c; a
+  idade avança com o tempo desde a resposta; quem marcou "Já respondi anteriormente" usa a última
+  resposta com esses dados) e o tempo sem fumar vem da pergunta 31 em faixas: "Mais de 15/20
+  anos" → fora do critério; "Mais de 10 anos" vale como 10 a 15 anos só nas respostas do
+  formulário novo (versão `…-rastreio-pulmao`), pois antes cobria 10 a 20 anos e fica "verificar".
+  O que a equipe registra na aba Rastreio prevalece sobre o questionário. A mensagem (WhatsApp/
+  e-mail, com prévia ao passar o cursor) explica a TC de tórax de baixa dose e **pergunta só o que
+  faltar**; com tudo respondido e indicação, convida para agendar a TC. Não indicados ainda "A
+  contatar" ficam sem mensagem de rastreio. Para fumantes, oferece também ajuda para parar. Em
+  **Registrar** (já preenchido com os dados do questionário), a equipe confirma ou corrige: o
+  painel calcula os **maços-ano** e a **indicação** pelo critério USPSTF 2021 (50 a 80
   anos, ≥ 20 maços-ano, fumante atual ou que parou há no máximo 15 anos), e registra data da TC,
   **Lung-RADS** e a conduta sugerida (v2022: 1–2 → nova TC em 12 meses; 3 → 6 meses; 4A → 3
   meses; 4B/4X → avaliação especializada; decisão médica). Situações: A contatar → Aguardando
